@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import { Box, Stack, Center } from "@mantine/core";
 import "./Navbar.css";
-// import { RxHamburgerMenu } from "react-icons/rx";
-// import { TbLetterV } from "react-icons/tb";
 import { IoVideocamOutline } from "react-icons/io5";
 import { LiaFileAudioSolid } from "react-icons/lia";
 import { PiSubtitlesLight } from "react-icons/pi";
@@ -11,8 +9,6 @@ import { CiText } from "react-icons/ci";
 import { LiaElementor } from "react-icons/lia";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbBrandPagekit } from "react-icons/tb";
-// import Card from "./HamburgerCard/Card";
-
 
 
 const Navbar = ({ activeCard, setActiveCard }) => {
