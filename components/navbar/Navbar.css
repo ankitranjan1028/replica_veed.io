@@ -1,0 +1,81 @@
+.navbar {
+  /* border: 1px solid red; */
+  height: 100vh;
+  position: relative;
+}
+
+.top {
+  /* border: 1px solid purple; */
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Webkit Browsers (Chrome, Safari, Edge) */
+.top::-webkit-scrollbar {
+  width: 10px;
+}
+
+.top::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.top::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.top::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox */
+.top {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.icon-container {
+  /* border: 1px solid blue; */
+  width: 70px;
+  flex-direction: column;
+  margin-top: 12px;
+  padding: 9px 0;
+  cursor: pointer;
+}
+
+.icon-container span {
+  font-size: 11px;
+}
+
+.icon {
+  /* border: 1px solid green; */
+  width: 25px;
+  height: 25px;
+}
+
+.btm {
+  position: absolute;
+  bottom: 0;
+  padding-bottom: 15px;
+  /* border-top: 1px solid lightgray; */
+  box-shadow: 0px -5px 5px -5px rgba(177, 176, 176, 0.75);
+}
+
+.active {
+  .icon {
+    color: #fff;
+    width: 17px;
+    height: 17px;
+  }
+
+  span {
+    color: #5666f5;
+    font-weight: 600;
+  }
+
+  .circle {
+    background-color: #5666f5;
+    padding: 10px;
+    border-radius: 50%;
+  }
+}

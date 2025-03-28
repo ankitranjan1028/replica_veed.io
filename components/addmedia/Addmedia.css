@@ -1,0 +1,159 @@
+.addmedia {
+  /* border: 1px solid black; */
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 20px;
+  max-width: 30vw;
+}
+
+h1 {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.media-upload-icon {
+  font-size: 1.75rem;
+}
+
+.media-filebox {
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 20px;
+  text-align: center;
+  border: 1px dashed lightgray;
+  margin-top: 20px;
+  border-radius: 15px;
+}
+
+.media-filebox:hover {
+  border: 1px dashed #5666f5;
+  background-color: #ebedff;
+}
+
+.media-buttons {
+  margin-top: 20px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.media-buttons button {
+  width: 48%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid lightgray;
+  border-radius: 10px;
+}
+
+.media-buttons button:hover {
+  border: 1px solid #5666f5;
+}
+
+.avtars {
+  /* border: 1px solid seagreen; */
+  margin-top: 40px;
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.heading h2 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.heading span {
+  font-size: 0.9rem;
+  color: gray;
+  cursor: pointer;
+}
+
+.slide {
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avtar {
+  border: 1px solid lightgray;
+  width: 75%;
+  height: 75%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #eeeef0;
+}
+
+.videos {
+  margin-top: 40px;
+}
+
+.categories {
+  display: flex;
+  gap: 15px;
+}
+
+.category {
+  border: 1px solid lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+  padding: 5px 10px;
+  font-size: 13px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.vid {
+  border: 1px solid lightgray;
+  width: 95%;
+  height: 80%;
+  border-radius: 10px;
+  background-color: #eeeef0;
+}
+
+.audios {
+  margin-top: 40px;
+}
+
+.music {
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+}
+
+.single {
+  border: 1px solid lightgray;
+  height: 55px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.more {
+  background-color: #eeeef0;
+  border-radius: 15px;
+  border: 0;
+}
+
+.effects {
+  margin-top: 40px;
+}
+
+.dots {
+  background-color: #eeeef0;
+  border-radius: 50%;
+  border: 0;
+}

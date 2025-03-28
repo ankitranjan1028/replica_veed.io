@@ -1,0 +1,81 @@
+.footer {
+  /* background: rgb(253, 253, 133); */
+  position: absolute;
+  bottom: 0;
+  width: 94%;
+  border-top: 1px solid lightgray;
+  background-color: #fff;
+}
+
+.fx {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.9rem;
+}
+
+.edit-controls {
+  /* border: 1px solid saddlebrown; */
+  justify-content: space-between;
+  padding: 15px 25px;
+}
+
+.view-controls {
+  /* border: 1px solid black; */
+  width: 220px;
+  font-size: 1rem;
+}
+
+.slider {
+  width: 100%;
+  margin-right: 50px;
+  position: relative;
+}
+
+.minus-btn {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+}
+
+.plus-btn {
+  position: absolute;
+  top: 50%;
+  right: -40px;
+  transform: translateY(-50%);
+}
+
+.fit {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.fit-text {
+  padding-right: 20px;
+}
+
+.setting-icon {
+  cursor: pointer;
+}
+
+.edit-area {
+  /* border: 1px solid darkblue; */
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-none {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.play {
+  cursor: pointer;
+}

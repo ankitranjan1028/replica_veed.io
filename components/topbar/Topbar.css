@@ -1,0 +1,72 @@
+.topbar {
+  /* border: 1px solid seagreen; */
+  font-size: 14px;
+  /* padding: 10px; */
+}
+
+.top-left {
+  /* border: 1px solid red; */
+  border-right: 1px solid #e5e5e5;
+  flex: 6;
+  padding: 10px;
+}
+
+.top-right {
+  /* border: 1px solid blue; */
+  flex: 4;
+  padding: 10px;
+}
+
+.project-name {
+  width: 130px;
+}
+
+.lgintoprog {
+  padding: 8px;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+.upgrade {
+  background-color: #f18914;
+  color: white;
+  font-weight: 600;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 7px;
+}
+
+.upgrade:hover {
+  background-color: #f18914;
+}
+
+.icon-bg {
+  background-color: #e37608;
+  color: white;
+  padding: 5px 3px;
+  border-radius: 10px;
+  margin-left: 5px;
+}
+
+.done {
+  background-color: #6495ED;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 7px;
+}
+
+.check-icon {
+  margin-left: 5px;
+}
+
+.undo,
+.redo {
+  cursor: pointer;
+}
