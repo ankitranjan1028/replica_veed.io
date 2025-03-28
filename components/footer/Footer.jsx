@@ -182,9 +182,9 @@
 
 //   useEffect(() => {
 //     const video = videoRef.current;
-    
+
 //     const updateTime = () => setCurrentTime(video.currentTime);
-    
+
 //     const updateDuration = () => {
 //       // Multiple checks to ensure duration is set
 //       if (video && video.duration && !isNaN(video.duration)) {
@@ -372,7 +372,7 @@
 //       };
 
 //       video.addEventListener('timeupdate', updateTime);
-      
+
 //       return () => {
 //         video.removeEventListener('timeupdate', updateTime);
 //       };
@@ -439,14 +439,14 @@ import { FiScissors } from "react-icons/fi";
 import { FaForward, FaPlus, FaBackward, FaPlay, FaPause } from "react-icons/fa";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 
-const Footer = ({ 
-  setAddFileWindow, 
-  fileType, 
-  videoRef, 
-  audioUrl, 
-  mediaProperties, 
+const Footer = ({
+  setAddFileWindow,
+  fileType,
+  videoRef,
+  audioUrl,
+  mediaProperties,
   setCurrentTime,
-  setIsPlaying 
+  setIsPlaying
 }) => {
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
@@ -508,7 +508,7 @@ const Footer = ({
 
       video.addEventListener('timeupdate', updateTime);
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
-      
+
       return () => {
         video.removeEventListener('timeupdate', updateTime);
         video.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -517,8 +517,8 @@ const Footer = ({
   }, [videoRef, setCurrentTime]);
 
   // Calculate progress percentage for slider
-  const progressPercentage = videoDuration > 0 
-    ? (currentVideoTime / videoDuration) * 100 
+  const progressPercentage = videoDuration > 0
+    ? (currentVideoTime / videoDuration) * 100
     : 0;
 
   return (
@@ -530,11 +530,31 @@ const Footer = ({
             <span>Split</span>
           </Box>
         </Box>
+
+        <Box className="fit">
+          <Box className="fit-text">
+            {/* <h5>Resolution: </h5> */}
+            {mediaProperties
+              ? `width: ${Math.round(mediaProperties.width)}`
+              : 'Fit'}
+          </Box>
+        </Box>
+
+        <Box className="fit">
+          <Box className="fit-text">
+            {/* <h5>Resolution: </h5> */}
+            {mediaProperties
+              ? `height: ${Math.round(mediaProperties.height)}`
+              : 'Fit'}
+          </Box>
+        </Box>
+
+
         <Box className="playAndPause fx">
           <Box className="fx">
             <FaBackward onClick={handleBackward} className="play" />
-            {videoRef?.current?.paused ? 
-              <FaPlay onClick={handlePlayPause} className="play" /> : 
+            {videoRef?.current?.paused ?
+              <FaPlay onClick={handlePlayPause} className="play" /> :
               <FaPause onClick={handlePlayPause} className="play" />
             }
             <FaForward onClick={handleForward} className="play" />
@@ -546,22 +566,16 @@ const Footer = ({
         <Box className="view-controls fx">
           <Box className="slider">
             <FaMagnifyingGlassMinus className="minus-btn" />
-            <Slider 
-              className="sld" 
-              color="blue" 
-              size="sm" 
+            <Slider
+              className="sld"
+              color="blue"
+              size="sm"
               value={progressPercentage}
               onChange={handleTimelineChange}
             />
             <FaMagnifyingGlassPlus className="plus-btn" />
           </Box>
-          <Box className="fit">
-            <Box className="fit-text">
-              {mediaProperties ? 
-                `${Math.round(mediaProperties.width)}x${Math.round(mediaProperties.height)}` : 
-                'Fit'}
-            </Box>
-          </Box>
+
         </Box>
       </Box>
     </Stack>
