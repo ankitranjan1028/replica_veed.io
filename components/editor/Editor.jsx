@@ -1,36 +1,87 @@
 "use client";
-import { useEffect, useRef, forwardRef } from 'react';
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useTimeContext } from '@/app/contexts/TimeContext';
 
 const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlaying, currentTime }, ref) => {
   const mediaRef = useRef(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const resizeHandle = useRef(null);
+  const lastPlayState = useRef(false);
+  const { setCurrentTime: setContextTime } = useTimeContext();
 
+  // Use useImperativeHandle to properly expose the media element
+  useImperativeHandle(ref, () => mediaRef.current, []);
+
+  // Add timeupdate event listener directly to ensure time tracking works
   useEffect(() => {
-    // Properly assign the forwarded ref
-    if (mediaRef.current) {
-      ref.current = mediaRef.current;
+    const video = mediaRef.current;
+    if (video && media?.type === 'video') {
+      const handleTimeUpdate = () => {
+        if (video.currentTime !== undefined) {
+          setContextTime(video.currentTime);
+        }
+      };
+      
+      video.addEventListener('timeupdate', handleTimeUpdate);
+      return () => {
+        video.removeEventListener('timeupdate', handleTimeUpdate);
+      };
     }
-  }, [ref]);
+  }, [media?.type, setContextTime]);
 
   useEffect(() => {
     const video = mediaRef.current;
     if (video && media?.type === 'video') {
-      if (isPlaying) {
-        video.play().catch(error => {
-          console.error("Error playing video:", error);
-        });
-      } else {
-        video.pause();
+      // Set current time if needed first, then handle play/pause
+      if (currentTime !== undefined && Math.abs(video.currentTime - currentTime) > 0.5) {
+        try {
+          video.currentTime = currentTime;
+        } catch (error) {
+          console.error("Error setting current time:", error);
+        }
       }
 
-      // Set current time if needed
-      if (currentTime !== undefined) {
-        video.currentTime = currentTime;
+      if (isPlaying) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error("Error playing video:", error);
+          });
+        }
+        lastPlayState.current = true;
+      } else {
+        video.pause();
+        lastPlayState.current = false;
       }
     }
   }, [isPlaying, currentTime, media?.type]);
+
+  // Handle dimension changes without affecting playback
+  useEffect(() => {
+    const video = mediaRef.current;
+    if (video && media?.type === 'video' && lastPlayState.current) {
+      // Small timeout to ensure DOM updates complete before playing
+      setTimeout(() => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error("Error resuming video after resize:", error);
+          });
+        }
+      }, 50);
+    }
+  }, [mediaProperties.width, mediaProperties.height, media?.type]);
+
+  // Add effect to handle media source changes
+  useEffect(() => {
+    const video = mediaRef.current;
+    if (video && media?.type === 'video') {
+      // Set initial state when video source changes
+      video.currentTime = 0;
+      lastPlayState.current = false;
+    }
+  }, [media?.url]);
 
   const handleMouseDown = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -39,9 +90,9 @@ const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlayi
 
     // Check if clicked on resize handle
     if (
-      x >= mediaProperties.x + mediaProperties.width - 10 &&
+      x >= mediaProperties.x + mediaProperties.width - 20 &&
       x <= mediaProperties.x + mediaProperties.width + 10 &&
-      y >= mediaProperties.y + mediaProperties.height - 10 &&
+      y >= mediaProperties.y + mediaProperties.height - 20 &&
       y <= mediaProperties.y + mediaProperties.height + 10
     ) {
       resizeHandle.current = { 
@@ -82,11 +133,15 @@ const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlayi
     } else if (resizeHandle.current) {
       const newWidth = Math.max(50, x - mediaProperties.x);
       const newHeight = Math.max(50, y - mediaProperties.y);
-      setMediaProperties(prev => ({
-        ...prev,
-        width: newWidth,
-        height: newHeight
-      }));
+      
+      // Use requestAnimationFrame for smoother updates
+      requestAnimationFrame(() => {
+        setMediaProperties(prev => ({
+          ...prev,
+          width: newWidth,
+          height: newHeight
+        }));
+      });
     }
   };
 
@@ -124,25 +179,40 @@ const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlayi
             boxSizing: 'border-box'
           }}
         >
-          <video
-            ref={mediaRef}
-            src={media.url}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
-            controls={false}
-          />
+          {media.type === 'video' ? (
+            <video
+              ref={mediaRef}
+              src={media.url}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+              controls={false}
+              preload="auto"
+            />
+          ) : media.type === 'image' ? (
+            <img
+              ref={mediaRef}
+              src={media.url}
+              alt="Uploaded media"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+            />
+          ) : null}
           <div
             style={{
               position: 'absolute',
-              right: '-5px',
-              bottom: '-5px',
-              width: '10px',
-              height: '10px',
+              right: '0',
+              bottom: '0',
+              width: '20px',
+              height: '20px',
               backgroundColor: '#3b82f6',
-              cursor: 'nwse-resize'
+              cursor: 'nwse-resize',
+              borderTopLeftRadius: '4px'
             }}
           />
         </div>

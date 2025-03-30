@@ -21,6 +21,9 @@ const Addmedia = ({ setFileType, setFile }) => {
         } else if (file.type.startsWith("video")) {
           setFileType("video");
           setFile(file);
+        } else if (file.type.startsWith("image")) {
+          setFileType("image");
+          setFile(file);
         }
       }
     },
@@ -31,7 +34,8 @@ const Addmedia = ({ setFileType, setFile }) => {
     onDrop,
     accept: {
       'video/*': ['.mp4', '.avi', '.mov', '.mkv'],
-      'audio/*': ['.mp3', '.wav', '.m4a']
+      'audio/*': ['.mp3', '.wav', '.m4a'],
+      'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp']
     }
   });
 
