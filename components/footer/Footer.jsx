@@ -82,29 +82,31 @@ const Footer = ({
     }
   };
 
+
   // Handle width change with debouncing
   const handleWidthChange = (value) => {
     if (mediaProperties && setMediaProperties) {
       setIsUpdatingDimensions(true);
-      
-      // Store current play state before dimension change
-      const wasPlaying = videoRef?.current && !videoRef.current.paused;
-      
-      // Pause video during resizing to prevent flickering
+
+      // Store current play state before dimension change (only for videos)
+      const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
+
+      // Pause video during resizing to prevent flickering (only for videos)
       if (wasPlaying && videoRef?.current) {
         videoRef.current.pause();
       }
-      
+
+      // Update width for any media type
       setMediaProperties(prev => ({
         ...prev,
         width: value
       }));
-      
+
       // Reset the updating flag after a short delay
       setTimeout(() => {
         setIsUpdatingDimensions(false);
-        
-        // Restore play state if it was playing
+
+        // Restore play state if it was playing (only for videos)
         if (wasPlaying && videoRef?.current && fileType === "video") {
           const playPromise = videoRef.current.play();
           if (playPromise !== undefined) {
@@ -117,29 +119,30 @@ const Footer = ({
     }
   };
 
-  // Handle height change with debouncing
+  // Similarly update the handleHeightChange function
   const handleHeightChange = (value) => {
     if (mediaProperties && setMediaProperties) {
       setIsUpdatingDimensions(true);
-      
-      // Store current play state before dimension change
-      const wasPlaying = videoRef?.current && !videoRef.current.paused;
-      
-      // Pause video during resizing to prevent flickering
+
+      // Store current play state before dimension change (only for videos)
+      const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
+
+      // Pause video during resizing to prevent flickering (only for videos)
       if (wasPlaying && videoRef?.current) {
         videoRef.current.pause();
       }
-      
+
+      // Update height for any media type
       setMediaProperties(prev => ({
         ...prev,
         height: value
       }));
-      
+
       // Reset the updating flag after a short delay
       setTimeout(() => {
         setIsUpdatingDimensions(false);
-        
-        // Restore play state if it was playing
+
+        // Restore play state if it was playing (only for videos)
         if (wasPlaying && videoRef?.current && fileType === "video") {
           const playPromise = videoRef.current.play();
           if (playPromise !== undefined) {
@@ -260,16 +263,11 @@ const Footer = ({
         <Box className="view-controls fx">
           <Box className="slider">
             <FaMagnifyingGlassMinus className="minus-btn" />
-            <Slider
-              className="sld"
-              color="blue"
-              size="sm"
-              value={progressPercentage}
-              onChange={handleTimelineChange}
-            />
+            <Slider className="sld" color="blue" size="sm" value={progressPercentage} />
             <FaMagnifyingGlassPlus className="plus-btn" />
           </Box>
         </Box>
+
       </Box>
     </Stack>
   );
