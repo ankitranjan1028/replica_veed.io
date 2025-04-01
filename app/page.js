@@ -92,8 +92,8 @@ const EditorWithContexts = () => {
       setFileName(newFile.name);
       
       // Reset media properties to default when a new file is loaded
-      const defaultWidth = 640;
-      const defaultHeight = 360;
+      const defaultWidth = 290;
+      const defaultHeight = 290;
       
       setMediaProperties({
         x: 0,

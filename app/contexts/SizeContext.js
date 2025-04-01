@@ -4,8 +4,8 @@ import { createContext, useContext, useState } from "react";
 const SizeContext = createContext();
 
 export const SizeProvider = ({ children }) => {
-  const [width, setWidth] = useState(350);
-  const [height, setHeight] = useState(350);
+  const [width, setWidth] = useState(290);
+  const [height, setHeight] = useState(290);
 
   return (
     <SizeContext.Provider value={{ width, setWidth, height, setHeight }}>
