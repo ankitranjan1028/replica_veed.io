@@ -34,7 +34,6 @@ const Addmedia = ({ setFileType, setFile }) => {
     onDrop,
     accept: {
       'video/*': ['.mp4', '.avi', '.mov', '.mkv'],
-      'audio/*': ['.mp3', '.wav', '.m4a'],
       'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp']
     }
   });
