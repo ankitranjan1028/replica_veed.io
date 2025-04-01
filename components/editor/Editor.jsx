@@ -1,25 +1,41 @@
 "use client";
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useTimeContext } from '@/app/contexts/TimeContext';
+import { usePlaybackContext } from '@/app/contexts/PlaybackContext';
 
-const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlaying, currentTime }, ref) => {
+const Editor = forwardRef(({ media, mediaProperties, setMediaProperties }, ref) => {
   const mediaRef = useRef(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const resizeHandle = useRef(null);
-  const lastPlayState = useRef(false);
-  const { setCurrentTime: setContextTime } = useTimeContext();
+  const { setCurrentTime, setDuration } = useTimeContext();
+  const { isPlaying, setIsPlaying } = usePlaybackContext();
 
   // Use useImperativeHandle to properly expose the media element
-  useImperativeHandle(ref, () => mediaRef.current, []);
+  useImperativeHandle(ref, () => ({
+    // Expose the underlying DOM element
+    current: mediaRef.current,
+    // Add helper method to get the actual video element
+    getVideoElement: () => {
+      if (!mediaRef.current) return null;
+      
+      // If it's already a video element, return it directly
+      if (mediaRef.current.tagName === 'VIDEO') {
+        return mediaRef.current;
+      }
+      
+      // Not exposing image elements
+      return null;
+    }
+  }), [mediaRef.current]);
 
-  // Add timeupdate event listener directly to ensure time tracking works
+  // Handle timeupdate event to sync with context
   useEffect(() => {
     const video = mediaRef.current;
     if (video && media?.type === 'video') {
       const handleTimeUpdate = () => {
         if (video.currentTime !== undefined) {
-          setContextTime(video.currentTime);
+          setCurrentTime(video.currentTime);
         }
       };
       
@@ -28,60 +44,73 @@ const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlayi
         video.removeEventListener('timeupdate', handleTimeUpdate);
       };
     }
-  }, [media?.type, setContextTime]);
+  }, [media?.type, setCurrentTime]);
 
+  // Handle metadata loading
   useEffect(() => {
     const video = mediaRef.current;
     if (video && media?.type === 'video') {
-      // Set current time if needed first, then handle play/pause
-      if (currentTime !== undefined && Math.abs(video.currentTime - currentTime) > 0.5) {
-        try {
-          video.currentTime = currentTime;
-        } catch (error) {
-          console.error("Error setting current time:", error);
+      const handleMetadata = () => {
+        if (video.duration && !isNaN(video.duration)) {
+          setDuration(video.duration);
         }
+      };
+      
+      // Check if already loaded
+      if (video.readyState >= 1 && video.duration && !isNaN(video.duration)) {
+        handleMetadata();
       }
+      
+      video.addEventListener('loadedmetadata', handleMetadata);
+      return () => {
+        video.removeEventListener('loadedmetadata', handleMetadata);
+      };
+    }
+  }, [media?.url, media?.type, setDuration]);
 
+  // Handle play/pause state changes
+  useEffect(() => {
+    const video = mediaRef.current;
+    if (video && media?.type === 'video') {
       if (isPlaying) {
         const playPromise = video.play();
         if (playPromise !== undefined) {
           playPromise.catch(error => {
             console.error("Error playing video:", error);
+            setIsPlaying(false); // Reset playing state if playback fails
           });
         }
-        lastPlayState.current = true;
       } else {
         video.pause();
-        lastPlayState.current = false;
       }
     }
-  }, [isPlaying, currentTime, media?.type]);
+  }, [isPlaying, media?.type, setIsPlaying]);
 
-  // Handle dimension changes without affecting playback
+  // Reset when media source changes
   useEffect(() => {
     const video = mediaRef.current;
-    if (video && media?.type === 'video' && lastPlayState.current) {
-      // Small timeout to ensure DOM updates complete before playing
-      setTimeout(() => {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.error("Error resuming video after resize:", error);
-          });
-        }
-      }, 50);
+    if (video && media?.url) {
+      // Reset to beginning when source changes
+      if (media?.type === 'video') {
+        video.currentTime = 0;
+        setCurrentTime(0);
+        setIsPlaying(false);
+        
+        // Loading event for new video
+        const handleLoaded = () => {
+          setCurrentTime(0);
+          if (video.duration && !isNaN(video.duration)) {
+            setDuration(video.duration);
+          }
+        };
+        
+        video.addEventListener('loadeddata', handleLoaded);
+        return () => {
+          video.removeEventListener('loadeddata', handleLoaded);
+        };
+      }
     }
-  }, [mediaProperties.width, mediaProperties.height, media?.type]);
-
-  // Add effect to handle media source changes
-  useEffect(() => {
-    const video = mediaRef.current;
-    if (video && media?.type === 'video') {
-      // Set initial state when video source changes
-      video.currentTime = 0;
-      lastPlayState.current = false;
-    }
-  }, [media?.url]);
+  }, [media?.url, media?.type, setCurrentTime, setDuration, setIsPlaying]);
 
   const handleMouseDown = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -134,14 +163,11 @@ const Editor = forwardRef(({ media, mediaProperties, setMediaProperties, isPlayi
       const newWidth = Math.max(50, x - mediaProperties.x);
       const newHeight = Math.max(50, y - mediaProperties.y);
       
-      // Use requestAnimationFrame for smoother updates
-      requestAnimationFrame(() => {
-        setMediaProperties(prev => ({
-          ...prev,
-          width: newWidth,
-          height: newHeight
-        }));
-      });
+      setMediaProperties(prev => ({
+        ...prev,
+        width: newWidth,
+        height: newHeight
+      }));
     }
   };
 

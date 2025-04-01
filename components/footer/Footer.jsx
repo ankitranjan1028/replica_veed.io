@@ -1,308 +1,54 @@
-// "use client";
-// import { useState, useEffect } from "react";
-// import { Stack, Box, Slider, NumberInput } from "@mantine/core";
-// import "./Footer.css";
-// import { FiScissors } from "react-icons/fi";
-// import { FaForward, FaPlus, FaBackward, FaPlay, FaPause } from "react-icons/fa";
-// import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
-// import { useTimeContext } from "@/app/contexts/TimeContext";
-
-// const Footer = ({
-//   setAddFileWindow,
-//   fileType,
-//   videoRef,
-//   audioUrl,
-//   mediaProperties,
-//   setMediaProperties,
-//   setCurrentTime,
-//   setIsPlaying,
-// }) => {
-//   const { duration, setDuration, currentTime: contextTime, setCurrentTime: setContextTime } = useTimeContext();
-//   const [currentVideoTime, setCurrentVideoTime] = useState(0);
-//   const [isUpdatingDimensions, setIsUpdatingDimensions] = useState(false);
-//   const [playState, setPlayState] = useState(false);
-
-//   const formatTime = (time) => {
-//     if (isNaN(time) || time === undefined) return "00:00";
-//     const minutes = Math.floor(time / 60);
-//     const seconds = Math.floor(time % 60);
-//     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-//   };
-
-//   const handlePlayPause = () => {
-//     const video = videoRef?.current;
-//     if (video && fileType === "video") {
-//       if (video.paused) {
-//         const playPromise = video.play();
-//         if (playPromise !== undefined) {
-//           playPromise.catch((error) => {
-//             console.error("Error playing video:", error);
-//           });
-//         }
-//         setPlayState(true);
-//         setIsPlaying(true);
-//       } else {
-//         video.pause();
-//         setPlayState(false);
-//         setIsPlaying(false);
-//       }
-//     }
-//   };
-
-//   const handleForward = () => {
-//     const video = videoRef?.current;
-//     if (video && fileType === "video") {
-//       const newTime = Math.min(video.currentTime + 10, video.duration);
-//       video.currentTime = newTime;
-//       setCurrentVideoTime(newTime);
-//       setCurrentTime(newTime);
-//       setContextTime(newTime);
-//     }
-//   };
-
-//   const handleBackward = () => {
-//     const video = videoRef?.current;
-//     if (video && fileType === "video") {
-//       const newTime = Math.max(video.currentTime - 10, 0);
-//       video.currentTime = newTime;
-//       setCurrentVideoTime(newTime);
-//       setCurrentTime(newTime);
-//       setContextTime(newTime);
-//     }
-//   };
-
-//   const handleTimelineChange = (value) => {
-//     const video = videoRef?.current;
-//     if (video && fileType === "video" && duration > 0) {
-//       const newTime = (value / 100) * duration;
-//       video.currentTime = newTime;
-//       setCurrentVideoTime(newTime);
-//       setCurrentTime(newTime);
-//       setContextTime(newTime);
-//     }
-//   };
-
-
-//   // Handle width change with debouncing
-//   const handleWidthChange = (value) => {
-//     if (mediaProperties && setMediaProperties) {
-//       setIsUpdatingDimensions(true);
-
-//       // Store current play state before dimension change (only for videos)
-//       const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
-
-//       // Pause video during resizing to prevent flickering (only for videos)
-//       if (wasPlaying && videoRef?.current) {
-//         videoRef.current.pause();
-//       }
-
-//       // Update width for any media type
-//       setMediaProperties(prev => ({
-//         ...prev,
-//         width: value
-//       }));
-
-//       // Reset the updating flag after a short delay
-//       setTimeout(() => {
-//         setIsUpdatingDimensions(false);
-
-//         // Restore play state if it was playing (only for videos)
-//         if (wasPlaying && videoRef?.current && fileType === "video") {
-//           const playPromise = videoRef.current.play();
-//           if (playPromise !== undefined) {
-//             playPromise.catch(error => {
-//               console.error("Error resuming after width change:", error);
-//             });
-//           }
-//         }
-//       }, 100);
-//     }
-//   };
-
-//   // Similarly update the handleHeightChange function
-//   const handleHeightChange = (value) => {
-//     if (mediaProperties && setMediaProperties) {
-//       setIsUpdatingDimensions(true);
-
-//       // Store current play state before dimension change (only for videos)
-//       const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
-
-//       // Pause video during resizing to prevent flickering (only for videos)
-//       if (wasPlaying && videoRef?.current) {
-//         videoRef.current.pause();
-//       }
-
-//       // Update height for any media type
-//       setMediaProperties(prev => ({
-//         ...prev,
-//         height: value
-//       }));
-
-//       // Reset the updating flag after a short delay
-//       setTimeout(() => {
-//         setIsUpdatingDimensions(false);
-
-//         // Restore play state if it was playing (only for videos)
-//         if (wasPlaying && videoRef?.current && fileType === "video") {
-//           const playPromise = videoRef.current.play();
-//           if (playPromise !== undefined) {
-//             playPromise.catch(error => {
-//               console.error("Error resuming after height change:", error);
-//             });
-//           }
-//         }
-//       }, 100);
-//     }
-//   };
-
-//   useEffect(() => {
-//     const video = videoRef?.current;
-
-//     if (!video || fileType !== "video") return;
-
-//     const updateTime = () => {
-//       if (video.currentTime !== undefined) {
-//         const currentTime = video.currentTime;
-//         setCurrentVideoTime(currentTime);
-//         setCurrentTime(currentTime);
-//         setContextTime(currentTime);
-//         // Update play state in case it was changed externally
-//         setPlayState(!video.paused);
-//       }
-//     };
-
-//     const handleLoadedMetadata = () => {
-//       if (video.duration && !isNaN(video.duration)) {
-//         setDuration(video.duration);
-//       }
-//     };
-
-//     // Ensure duration is captured when video is ready
-//     if (video.readyState >= 1) {
-//       handleLoadedMetadata();
-//     }
-
-//     // Ensure event listeners are added properly
-//     video.addEventListener("timeupdate", updateTime);
-//     video.addEventListener("loadedmetadata", handleLoadedMetadata);
-//     video.addEventListener("play", () => setPlayState(true));
-//     video.addEventListener("pause", () => setPlayState(false));
-
-//     return () => {
-//       video.removeEventListener("timeupdate", updateTime);
-//       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-//       video.removeEventListener("play", () => setPlayState(true));
-//       video.removeEventListener("pause", () => setPlayState(false));
-//     };
-//   }, [videoRef, fileType, setCurrentTime, setDuration, setContextTime]);
-
-//   // Calculate progress percentage for slider
-//   const progressPercentage = duration > 0 ? (currentVideoTime / duration) * 100 : 0;
-
-//   return (
-//     <Stack className="footer" justify="flex-start" gap="0">
-//       <Box className="edit-controls fx">
-//         <Box className="edit-buttons fx">
-//           <Box className="fx">
-//             <FiScissors />
-//             <span>Split</span>
-//           </Box>
-//         </Box>
-
-//         <Box className="fit">
-//           <NumberInput
-//             className="dimension-input"
-//             placeholder="Width"
-//             label="Width"
-//             min={50}
-//             max={2000}
-//             step={10}
-//             value={mediaProperties ? Math.round(mediaProperties.width) : 0}
-//             onChange={handleWidthChange}
-//             hideControls={false}
-//             styles={{
-//               input: { textAlign: 'center' },
-//               wrapper: { width: '80px' }
-//             }}
-//           />
-//         </Box>
-
-//         <Box className="fit">
-//           <NumberInput
-//             className="dimension-input"
-//             placeholder="Height"
-//             label="Height"
-//             min={50}
-//             max={2000}
-//             step={10}
-//             value={mediaProperties ? Math.round(mediaProperties.height) : 0}
-//             onChange={handleHeightChange}
-//             hideControls={false}
-//             styles={{
-//               input: { textAlign: 'center' },
-//               wrapper: { width: '80px' }
-//             }}
-//           />
-//         </Box>
-
-//         <Box className="playAndPause fx">
-//           <Box className="fx">
-//             <FaBackward onClick={handleBackward} className="play" />
-//             {!playState ? (
-//               <FaPlay onClick={handlePlayPause} className="play" />
-//             ) : (
-//               <FaPause onClick={handlePlayPause} className="play" />
-//             )}
-//             <FaForward onClick={handleForward} className="play" />
-//           </Box>
-//           <Box>
-//             {formatTime(currentVideoTime)} / {formatTime(duration)}
-//           </Box>
-//         </Box>
-
-//         <Box className="view-controls fx">
-//           <Box className="slider">
-//             <FaMagnifyingGlassMinus className="minus-btn" />
-//             <Slider className="sld" color="blue" size="sm" value={progressPercentage} />
-//             <FaMagnifyingGlassPlus className="plus-btn" />
-//           </Box>
-//         </Box>
-
-//       </Box>
-//     </Stack>
-//   );
-// };
-
-// export default Footer;
-
-
-
-
-
-
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Stack, Box, Slider, NumberInput } from "@mantine/core";
 import "./Footer.css";
 import { FiScissors } from "react-icons/fi";
 import { FaForward, FaPlus, FaBackward, FaPlay, FaPause } from "react-icons/fa";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { useTimeContext } from "@/app/contexts/TimeContext";
+import { usePlaybackContext } from "@/app/contexts/PlaybackContext";
 
 const Footer = ({
-  setAddFileWindow,
   fileType,
   videoRef,
-  audioUrl,
   mediaProperties,
   setMediaProperties,
-  setCurrentTime,
-  setIsPlaying,
 }) => {
-  const { duration, setDuration, currentTime: contextTime, setCurrentTime: setContextTime } = useTimeContext();
-  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const { duration, currentTime, setCurrentTime } = useTimeContext();
+  const { isPlaying, setIsPlaying } = usePlaybackContext();
   const [isUpdatingDimensions, setIsUpdatingDimensions] = useState(false);
-  const [playState, setPlayState] = useState(false);
+  const [dimensionUpdateTimeout, setDimensionUpdateTimeout] = useState(null);
+  const prevFileTypeRef = useRef(fileType);
+
+  // Helper function to safely get the video element
+  const getVideoElement = () => {
+    // If file type isn't video, we shouldn't try to access video elements
+    if (fileType !== "video") return null;
+    
+    if (!videoRef?.current) return null;
+    
+    try {
+      // Try to use the getVideoElement helper if available
+      if (typeof videoRef.current.getVideoElement === 'function') {
+        return videoRef.current.getVideoElement();
+      }
+      
+      // Fall back to direct reference if it's a video
+      if (videoRef.current.tagName === 'VIDEO') {
+        return videoRef.current;
+      }
+      
+      // Otherwise try to get the video element from the ref's current
+      if (videoRef.current.current && videoRef.current.current.tagName === 'VIDEO') {
+        return videoRef.current.current;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error accessing video element:", error);
+      return null;
+    }
+  };
 
   const formatTime = (time) => {
     if (isNaN(time) || time === undefined) return "00:00";
@@ -315,20 +61,21 @@ const Footer = ({
     // Only allow play/pause for video files
     if (fileType !== "video") return;
     
-    const video = videoRef?.current;
+    const video = getVideoElement();
     if (video) {
-      if (video.paused) {
+      if (!isPlaying) {
+        // Ensure we can actually play the video
         const playPromise = video.play();
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
+          playPromise.then(() => {
+            setIsPlaying(true);
+          }).catch(error => {
             console.error("Error playing video:", error);
+            setIsPlaying(false);
           });
         }
-        setPlayState(true);
-        setIsPlaying(true);
       } else {
         video.pause();
-        setPlayState(false);
         setIsPlaying(false);
       }
     }
@@ -338,13 +85,15 @@ const Footer = ({
     // Only allow seeking for video files
     if (fileType !== "video") return;
     
-    const video = videoRef?.current;
+    const video = getVideoElement();
     if (video) {
-      const newTime = Math.min(video.currentTime + 10, video.duration);
-      video.currentTime = newTime;
-      setCurrentVideoTime(newTime);
-      setCurrentTime(newTime);
-      setContextTime(newTime);
+      try {
+        const newTime = Math.min(video.currentTime + 10, video.duration || 0);
+        video.currentTime = newTime;
+        setCurrentTime(newTime);
+      } catch (error) {
+        console.error("Error seeking forward:", error);
+      }
     }
   };
 
@@ -352,13 +101,15 @@ const Footer = ({
     // Only allow seeking for video files
     if (fileType !== "video") return;
     
-    const video = videoRef?.current;
+    const video = getVideoElement();
     if (video) {
-      const newTime = Math.max(video.currentTime - 10, 0);
-      video.currentTime = newTime;
-      setCurrentVideoTime(newTime);
-      setCurrentTime(newTime);
-      setContextTime(newTime);
+      try {
+        const newTime = Math.max(video.currentTime - 10, 0);
+        video.currentTime = newTime;
+        setCurrentTime(newTime);
+      } catch (error) {
+        console.error("Error seeking backward:", error);
+      }
     }
   };
 
@@ -366,145 +117,100 @@ const Footer = ({
     // Only allow timeline changes for video files
     if (fileType !== "video") return;
     
-    const video = videoRef?.current;
+    const video = getVideoElement();
     if (video && duration > 0) {
-      const newTime = (value / 100) * duration;
-      video.currentTime = newTime;
-      setCurrentVideoTime(newTime);
-      setCurrentTime(newTime);
-      setContextTime(newTime);
+      try {
+        const newTime = (value / 100) * duration;
+        video.currentTime = newTime;
+        setCurrentTime(newTime);
+      } catch (error) {
+        console.error("Error changing timeline:", error);
+      }
     }
   };
 
-  // Handle width change with debouncing
+  // Improved dimension change handler with debouncing - no play state interruption
+  const handleDimensionChange = (dimension, value) => {
+    if (mediaProperties && setMediaProperties) {
+      // Clear any existing timeout to prevent multiple updates
+      if (dimensionUpdateTimeout) {
+        clearTimeout(dimensionUpdateTimeout);
+      }
+
+      // Update dimensions immediately without pausing video
+      setMediaProperties(prev => ({
+        ...prev,
+        [dimension]: value
+      }));
+
+      // Mark as updating dimensions
+      setIsUpdatingDimensions(true);
+      
+      // Reset the updating flag after a short delay
+      const timeout = setTimeout(() => {
+        setIsUpdatingDimensions(false);
+      }, 50);
+      
+      setDimensionUpdateTimeout(timeout);
+    }
+  };
+
+  // Handle width change
   const handleWidthChange = (value) => {
-    if (mediaProperties && setMediaProperties) {
-      setIsUpdatingDimensions(true);
-
-      // Store current play state before dimension change (only for videos)
-      const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
-
-      // Pause video during resizing to prevent flickering (only for videos)
-      if (wasPlaying && videoRef?.current) {
-        videoRef.current.pause();
-      }
-
-      // Update width for any media type
-      setMediaProperties(prev => ({
-        ...prev,
-        width: value
-      }));
-
-      // Reset the updating flag after a short delay
-      setTimeout(() => {
-        setIsUpdatingDimensions(false);
-
-        // Restore play state if it was playing (only for videos)
-        if (wasPlaying && videoRef?.current && fileType === "video") {
-          const playPromise = videoRef.current.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.error("Error resuming after width change:", error);
-            });
-          }
-        }
-      }, 100);
-    }
+    handleDimensionChange('width', value);
   };
 
-  // Similarly update the handleHeightChange function
+  // Handle height change
   const handleHeightChange = (value) => {
-    if (mediaProperties && setMediaProperties) {
-      setIsUpdatingDimensions(true);
-
-      // Store current play state before dimension change (only for videos)
-      const wasPlaying = fileType === "video" && videoRef?.current && !videoRef.current.paused;
-
-      // Pause video during resizing to prevent flickering (only for videos)
-      if (wasPlaying && videoRef?.current) {
-        videoRef.current.pause();
+    handleDimensionChange('height', value);
+  };
+  
+  // Detect file type changes
+  useEffect(() => {
+    // If we switched file types
+    if (fileType !== prevFileTypeRef.current) {
+      // Reset playback state
+      if (isPlaying) {
+        setIsPlaying(false);
       }
+      
+      prevFileTypeRef.current = fileType;
+    }
+  }, [fileType, isPlaying, setIsPlaying]);
 
-      // Update height for any media type
-      setMediaProperties(prev => ({
-        ...prev,
-        height: value
-      }));
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dimensionUpdateTimeout) {
+        clearTimeout(dimensionUpdateTimeout);
+      }
+    };
+  }, [dimensionUpdateTimeout]);
 
-      // Reset the updating flag after a short delay
-      setTimeout(() => {
-        setIsUpdatingDimensions(false);
-
-        // Restore play state if it was playing (only for videos)
-        if (wasPlaying && videoRef?.current && fileType === "video") {
-          const playPromise = videoRef.current.play();
+  // Sync video element with playback state when needed
+  useEffect(() => {
+    if (fileType === "video") {
+      // Get the current video element
+      const videoEl = getVideoElement();
+      if (videoEl) {
+        // Update the video element state to match context
+        if (isPlaying && videoEl.paused) {
+          const playPromise = videoEl.play();
           if (playPromise !== undefined) {
             playPromise.catch(error => {
-              console.error("Error resuming after height change:", error);
+              console.error("Error playing video:", error);
+              setIsPlaying(false);
             });
           }
+        } else if (!isPlaying && !videoEl.paused) {
+          videoEl.pause();
         }
-      }, 100);
-    }
-  };
-
-  // Effect to reset state when fileType changes
-  useEffect(() => {
-    // Reset timer and play state when switching between file types
-    if (fileType !== "video") {
-      setCurrentVideoTime(0);
-      setCurrentTime(0);
-      setContextTime(0);
-      setDuration(0);
-      setPlayState(false);
-      setIsPlaying(false);
-    }
-  }, [fileType, setCurrentTime, setContextTime, setDuration, setIsPlaying]);
-
-  useEffect(() => {
-    const video = videoRef?.current;
-
-    // Early return if not a video file or no video ref
-    if (!video || fileType !== "video") return;
-
-    const updateTime = () => {
-      if (video.currentTime !== undefined) {
-        const currentTime = video.currentTime;
-        setCurrentVideoTime(currentTime);
-        setCurrentTime(currentTime);
-        setContextTime(currentTime);
-        // Update play state in case it was changed externally
-        setPlayState(!video.paused);
       }
-    };
-
-    const handleLoadedMetadata = () => {
-      if (video.duration && !isNaN(video.duration)) {
-        setDuration(video.duration);
-      }
-    };
-
-    // Ensure duration is captured when video is ready
-    if (video.readyState >= 1) {
-      handleLoadedMetadata();
     }
-
-    // Ensure event listeners are added properly
-    video.addEventListener("timeupdate", updateTime);
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    video.addEventListener("play", () => setPlayState(true));
-    video.addEventListener("pause", () => setPlayState(false));
-
-    return () => {
-      video.removeEventListener("timeupdate", updateTime);
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      video.removeEventListener("play", () => setPlayState(true));
-      video.removeEventListener("pause", () => setPlayState(false));
-    };
-  }, [videoRef, fileType, setCurrentTime, setDuration, setContextTime]);
+  }, [fileType, isPlaying, setIsPlaying]);
 
   // Calculate progress percentage for slider
-  const progressPercentage = duration > 0 ? (currentVideoTime / duration) * 100 : 0;
+  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Determine if playback controls should be enabled
   const playbackEnabled = fileType === "video";
@@ -526,7 +232,7 @@ const Footer = ({
             label="Width"
             min={50}
             max={2000}
-            step={10}
+            step={1}
             value={mediaProperties ? Math.round(mediaProperties.width) : 0}
             onChange={handleWidthChange}
             hideControls={false}
@@ -544,7 +250,7 @@ const Footer = ({
             label="Height"
             min={50}
             max={2000}
-            step={10}
+            step={1}
             value={mediaProperties ? Math.round(mediaProperties.height) : 0}
             onChange={handleHeightChange}
             hideControls={false}
@@ -561,7 +267,7 @@ const Footer = ({
               onClick={handleBackward} 
               className={`play ${!playbackEnabled ? 'disabled-control' : ''}`} 
             />
-            {!playState ? (
+            {!isPlaying ? (
               <FaPlay 
                 onClick={handlePlayPause} 
                 className={`play ${!playbackEnabled ? 'disabled-control' : ''}`}
@@ -579,7 +285,7 @@ const Footer = ({
           </Box>
           <Box>
             {playbackEnabled ? (
-              `${formatTime(currentVideoTime)} / ${formatTime(duration)}`
+              `${formatTime(currentTime)} / ${formatTime(duration)}`
             ) : (
               "00:00 / 00:00"
             )}
